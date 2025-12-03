@@ -1,9 +1,14 @@
+name: Test OIDC Role Assumption
+
+on:
+  workflow_dispatch:
+
 jobs:
   test-oidc:
     runs-on: ubuntu-latest
 
     permissions:
-      id-token: write       # 必须，有了这个才可以用 OIDC
+      id-token: write
       contents: read
 
     steps:
