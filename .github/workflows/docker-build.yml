@@ -1,4 +1,4 @@
-name: Test OIDC Role Assumption
+name: build and push docker image
 
 on:
   workflow_dispatch:
