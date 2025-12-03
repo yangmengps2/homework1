@@ -11,12 +11,6 @@ Parameters:
   PublicSubnet2Cidr:
     Type: String
     Default: 10.0.2.0/24
-  PrivateSubnet1Cidr:
-    Type: String
-    Default: 10.0.3.0/24
-  PrivateSubnet2Cidr:
-    Type: String
-    Default: 10.0.4.0/24
   ECSClusterName:
     Type: String
     Default: app
@@ -75,27 +69,6 @@ Resources:
       Tags:
         - Key: Name
           Value: demo-public-2
-
-  # Private Subnets
-  PrivateSubnet1:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref VPC
-      CidrBlock: !Ref PrivateSubnet1Cidr
-      AvailabilityZone: !Select [0, !GetAZs '']
-      Tags:
-        - Key: Name
-          Value: demo-private-1
-
-  PrivateSubnet2:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref VPC
-      CidrBlock: !Ref PrivateSubnet2Cidr
-      AvailabilityZone: !Select [1, !GetAZs '']
-      Tags:
-        - Key: Name
-          Value: demo-private-2
 
   # Route Table for Public
   PublicRouteTable:
@@ -249,6 +222,7 @@ Resources:
   # ECS Service
   ECSService:
     Type: AWS::ECS::Service
+    DependsOn: Listener
     Properties:
       ServiceName: helloapp-service
       Cluster: !Ref ECSCluster
@@ -261,8 +235,8 @@ Resources:
           SecurityGroups:
             - !Ref ECSServiceSecurityGroup
           Subnets:
-            - !Ref PrivateSubnet1
-            - !Ref PrivateSubnet2
+            - !Ref PublicSubnet1
+            - !Ref PublicSubnet2
       LoadBalancers:
         - TargetGroupArn: !Ref TargetGroup
           ContainerName: helloapp
