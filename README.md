@@ -39,7 +39,7 @@ Pushing to the `main` branch launches two workflows:
 - Trigger CD
 
 ### **3. CD (Infrastructure + Service Deployment)**
-- Deploy/update CloudFormation stack (`infra/stack.yaml`)
+- Deploy/update CloudFormation stack (`infra/infra.yml`)
 - Update ECS TaskDefinition with new image
 - ECS performs **rolling deployment**
 - ALB directs traffic to healthy tasks
@@ -51,8 +51,8 @@ Pushing to the `main` branch launches two workflows:
 ### GitHub Actions Workflows
 | Workflow | Path | Description |
 |----------|------|-------------|
-| **App Build & Push** | `.github/workflows/app.yaml` | Builds Docker image and pushes to ECR |
-| **Infra Deploy** | `.github/workflows/infra.yaml` | Deploys CloudFormation and updates ECS |
+| **App Build & Push** | `.github/workflows/docker-build.yml` | Builds Docker image and pushes to ECR |
+| **Infra Deploy** | `.github/workflows/deploy-infra.yml` | Deploys CloudFormation and updates ECS |
 
 ### What’s Automated
 - Docker image build
