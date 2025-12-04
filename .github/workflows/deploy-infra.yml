@@ -39,5 +39,9 @@ jobs:
           aws cloudformation deploy \
             --stack-name helloapp-stack \
             --template-file infra/infra.yml \
-            --capabilities CAPABILITY_NAMED_IAM \
-            --parameter-overrides ContainerImage=$IMAGE_URI
+            --capabilities CAPABILITY_NAMED_IAM
+
+          aws ecs update-service \
+            --cluster helloapp-cluster \
+            --service helloapp-service \
+            --force-new-deployment
