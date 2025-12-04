@@ -143,7 +143,7 @@ repo/
 1. Deploy succeeds
 2. Visit:
 ```
-http://helloapp-alb-545299018.ap-southeast-2.elb.amazonaws.com/hello
+helloapp-alb-1201828001.ap-southeast-2.elb.amazonaws.com/hello
 ```
 You should see:
 ```
@@ -160,7 +160,7 @@ This repository is production-ready for:
 - Demos / education  
 
 For production, add:
-- HTTPS (LB https listener 443 + LB http listener 80 redirection + ACM + R53 record)
+- HTTPS (LB https listener 443 + LB http listener 80 redirection to 443 + ACM + R53 record)
 - WAF
 - Use Codedeploy to realise ECS Blue/Green deployment
 - Every new build of docker image should use a new tag, regenerate a new version of ECS task defintion which uses this specific image tag, instead of always using latest in ECS.
