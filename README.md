@@ -87,7 +87,7 @@ Assumptions:
 | Component | Monthly Estimate |
 |----------|------------------|
 | **ALB (Load Balancer)** | ~$18 (base) + ~$0.20 per LCU → ~$20 |
-| **ECS Fargate Tasks (2 AZ)** | ≈ $26–30 |
+| **ECS Fargate Tasks x 2 (2 AZs)** | ≈ $26–30 |
 | **ECR Storage/Requests** | < $1 |
 | **CloudWatch Logs** | ~$1–2 |
 | **Total** | **~$50–55 / month** |
@@ -162,3 +162,6 @@ This repository is production-ready for:
 For production, add:
 - HTTPS (LB https listener 443 + LB http listener 80 redirection + ACM + R53 record)
 - WAF
+- Use Codedeploy to realise ECS Blue/Green deployment
+- Every new build of docker image should use a new tag, regenerate a new version of ECS task defintion which uses this specific image tag, instead of always using latest in ECS.
+
