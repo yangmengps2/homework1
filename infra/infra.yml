@@ -250,6 +250,9 @@ Resources:
 
   ECSServiceScalableTarget:
     Type: AWS::ApplicationAutoScaling::ScalableTarget
+    DependsOn:
+      - ECSService
+      - Listener
     Properties:
       MaxCapacity: 3
       MinCapacity: 2
