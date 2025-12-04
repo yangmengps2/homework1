@@ -17,6 +17,7 @@ Parameters:
   ContainerImage:
     Type: String
     Description: ECR image URI
+    Default: 939503809934.dkr.ecr.ap-southeast-2.amazonaws.com/helloapp:latest
   ContainerPort:
     Type: Number
     Default: 5000
