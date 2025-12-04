@@ -1,7 +1,15 @@
 name: deploy cloudformation stack
 
 on:
-  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - "infra/**"
+      - ".github/workflows/deploy-infra.yml"
+
+  workflow_run:
+    workflows: ["Build and Push Docker Image"]
+    types: [completed]
 
 jobs:
   deploy-infra:
