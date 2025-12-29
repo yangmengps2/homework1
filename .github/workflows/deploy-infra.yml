@@ -7,9 +7,9 @@ on:
       - "infra/**"
       - ".github/workflows/deploy-infra.yml"
 
-  workflow_run:
-    workflows: ["Build and Push Docker Image"]
-    types: [completed]
+  # workflow_run:
+    # workflows: ["Build and Push Docker Image"]
+    # types: [completed]
 
   workflow_dispatch:
 

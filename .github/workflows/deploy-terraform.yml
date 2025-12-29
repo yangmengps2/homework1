@@ -1,0 +1,65 @@
+name: deploy terraform (infra-tf)
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - "infra-tf/**"
+      - ".github/workflows/deploy-terraform.yml"
+
+  #workflow_run:
+    #workflows: ["Build and Push Docker Image"]
+    #types: [completed]
+
+  workflow_dispatch:
+
+jobs:
+  deploy-tf:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    defaults:
+      run:
+        working-directory: infra-tf
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::939503809934:role/GithubActionsCICDRole
+          aws-region: ap-southeast-2
+
+      - name: Verify AWS identity
+        run: aws sts get-caller-identity
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.5
+
+      - name: Terraform init (S3 backend)
+        run: |
+          terraform init
+
+      - name: Terraform fmt (check)
+        run: terraform fmt -check -recursive
+
+      - name: Terraform validate
+        run: terraform validate
+
+      - name: Terraform plan
+        env:
+          # 先沿用你现在的写死 IMAGE_URI 风格（后面可改成从 docker workflow 产出传入）
+          TF_VAR_container_image: 939503809934.dkr.ecr.ap-southeast-2.amazonaws.com/helloapp:latest
+        run: terraform plan -no-color
+
+      - name: Terraform apply
+        env:
+          TF_VAR_container_image: 939503809934.dkr.ecr.ap-southeast-2.amazonaws.com/helloapp:latest
+        run: terraform apply -auto-approve
