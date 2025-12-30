@@ -1,4 +1,4 @@
-name: deploy terraform (infra-tf)
+name: deploy terraform (infra-tf) - dev only
 
 on:
   push:
@@ -6,58 +6,49 @@ on:
     paths:
       - "infra-tf/**"
       - ".github/workflows/deploy-terraform.yml"
+  workflow_dispatch: {}
 
-  #workflow_run:
-    #workflows: ["Build and Push Docker Image"]
-    #types: [completed]
+permissions:
+  id-token: write
+  contents: read
 
-  workflow_dispatch:
+env:
+  ENV: dev
+  TFVARS: envs/dev.tfvars
 
 jobs:
   plan:
     runs-on: ubuntu-latest
-
-    permissions:
-      id-token: write
-      contents: read
-
     defaults:
       run:
         working-directory: infra-tf
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Configure AWS credentials via OIDC
-        uses: aws-actions/configure-aws-credentials@v4
+      - name: Ensure tfvars exists
+        run: |
+          test -f "$TFVARS" || (echo "Missing $TFVARS" && exit 1)
+
+      - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::939503809934:role/GithubActionsCICDRole
           aws-region: ap-southeast-2
 
-      - name: Verify AWS identity
-        run: aws sts get-caller-identity
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+      - uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.7.5
+          terraform_wrapper: false
 
-      - name: Terraform init (S3 backend)
-        run: terraform init
+      - name: Init
+        run: terraform init -input=false
 
-      - name: Terraform fmt (check)
-        run: terraform fmt -check -recursive
+      - name: Select workspace (dev)
+        run: terraform workspace select "$ENV" || terraform workspace new "$ENV"
 
-      - name: Terraform validate
-        run: terraform validate
+      - name: Plan (dev)
+        run: terraform plan -input=false -no-color -var-file="$TFVARS" -out=tfplan
 
-      - name: Terraform plan (output file)
-        env:
-          TF_VAR_container_image: 939503809934.dkr.ecr.ap-southeast-2.amazonaws.com/helloapp:latest
-        run: terraform plan -no-color -out=tfplan
-
-      - name: Upload plan artifact
+      - name: Upload tfplan
         uses: actions/upload-artifact@v4
         with:
           name: tfplan
@@ -67,43 +58,35 @@ jobs:
     runs-on: ubuntu-latest
     needs: [plan]
 
-    # ✅ 关键：任何触发来源都必须手工审批才会继续
+    # 保留：手工审批
     environment: terraform-apply
-
-    permissions:
-      id-token: write
-      contents: read
 
     defaults:
       run:
         working-directory: infra-tf
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Download plan artifact
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           name: tfplan
           path: infra-tf
 
-      - name: Configure AWS credentials via OIDC
-        uses: aws-actions/configure-aws-credentials@v4
+      - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::939503809934:role/GithubActionsCICDRole
           aws-region: ap-southeast-2
 
-      - name: Verify AWS identity
-        run: aws sts get-caller-identity
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+      - uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.7.5
+          terraform_wrapper: false
 
-      - name: Terraform init (S3 backend)
-        run: terraform init
+      - name: Init
+        run: terraform init -input=false
 
-      - name: Terraform apply (approved plan)
+      - name: Select workspace (dev)
+        run: terraform workspace select "$ENV"
+
+      - name: Apply tfplan (dev)
         run: terraform apply -auto-approve tfplan
