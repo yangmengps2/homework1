@@ -4,10 +4,7 @@ module "network" {
   name_prefix = var.name_prefix
   vpc_cidr    = var.vpc_cidr
 
-  public_subnet_cidrs = [
-    var.public_subnet_1_cidr,
-    var.public_subnet_2_cidr,
-  ]
+  public_subnet_cidrs = var.public_subnet_cidrs
 }
 
 module "iam" {
