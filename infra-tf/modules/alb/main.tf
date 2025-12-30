@@ -1,7 +1,7 @@
 resource "aws_security_group" "alb" {
-  name        = "helloapp-alb-sg"
+  name        = "${var.name_prefix}-alb-sg"
   description = "ALB security group"
-  vpc_id      = aws_vpc.this.id
+  vpc_id      = var.vpc_id
 
   ingress {
     description = "HTTP from internet"
@@ -19,29 +19,29 @@ resource "aws_security_group" "alb" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = { Name = "helloapp-alb-sg" }
+  tags = { Name = "${var.name_prefix}-alb-sg" }
 }
 
 resource "aws_lb" "this" {
-  name               = "helloapp-alb"
+  name               = "${var.name_prefix}-alb"
   load_balancer_type = "application"
   internal           = false
   security_groups    = [aws_security_group.alb.id]
-  subnets            = [aws_subnet.public_1.id, aws_subnet.public_2.id]
+  subnets            = var.public_subnet_ids
 
-  tags = { Name = "helloapp-alb" }
+  tags = { Name = "${var.name_prefix}-alb" }
 }
 
 resource "aws_lb_target_group" "this" {
-  name        = "helloapp-tg"
-  port        = 5000
+  name        = "${var.name_prefix}-tg"
+  port        = var.target_port
   protocol    = "HTTP"
-  vpc_id      = aws_vpc.this.id
+  vpc_id      = var.vpc_id
   target_type = "ip"
 
   health_check {
     enabled = true
-    path    = "/hello"
+    path    = var.health_check_path
   }
 }
 

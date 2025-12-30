@@ -1,55 +1,51 @@
-data "aws_availability_zones" "available" {
-  state = "available"
+module "network" {
+  source = "./modules/network"
+
+  name_prefix = var.name_prefix
+  vpc_cidr    = var.vpc_cidr
+
+  public_subnet_cidrs = [
+    var.public_subnet_1_cidr,
+    var.public_subnet_2_cidr,
+  ]
 }
 
-resource "aws_vpc" "this" {
-  cidr_block           = var.vpc_cidr
-  enable_dns_hostnames = true
-  enable_dns_support   = true
-
-  tags = { Name = "helloapp-vpc" }
+module "iam" {
+  source      = "./modules/iam"
+  name_prefix = var.name_prefix
 }
 
-resource "aws_internet_gateway" "this" {
-  vpc_id = aws_vpc.this.id
-  tags   = { Name = "helloapp-igw" }
+module "alb" {
+  source = "./modules/alb"
+
+  name_prefix       = var.name_prefix
+  vpc_id            = module.network.vpc_id
+  public_subnet_ids = module.network.public_subnet_ids
+
+  target_port       = var.container_port
+  health_check_path = var.health_check_path
 }
 
-resource "aws_subnet" "public_1" {
-  vpc_id                  = aws_vpc.this.id
-  cidr_block              = var.public_subnet_1_cidr
-  availability_zone       = data.aws_availability_zones.available.names[0]
-  map_public_ip_on_launch = true
+module "ecs" {
+  source = "./modules/ecs"
 
-  tags = { Name = "helloapp-public-subnet-1" }
-}
+  depends_on = [module.alb]
 
-resource "aws_subnet" "public_2" {
-  vpc_id                  = aws_vpc.this.id
-  cidr_block              = var.public_subnet_2_cidr
-  availability_zone       = data.aws_availability_zones.available.names[1]
-  map_public_ip_on_launch = true
+  name_prefix       = var.name_prefix
+  aws_region        = var.aws_region
+  vpc_id            = module.network.vpc_id
+  public_subnet_ids = module.network.public_subnet_ids
 
-  tags = { Name = "helloapp-public-subnet-2" }
-}
+  ecs_cluster_name = var.ecs_cluster_name
+  container_image  = var.container_image
+  container_port   = var.container_port
 
-resource "aws_route_table" "public" {
-  vpc_id = aws_vpc.this.id
-  tags   = { Name = "helloapp-public-rt" }
-}
+  alb_sg_id          = module.alb.alb_sg_id
+  target_group_arn   = module.alb.target_group_arn
 
-resource "aws_route" "public_default" {
-  route_table_id         = aws_route_table.public.id
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_internet_gateway.this.id
-}
+  ecs_execution_role_arn = module.iam.ecs_execution_role_arn
+  ecs_task_role_arn      = module.iam.ecs_task_role_arn
+  autoscaling_role_arn   = module.iam.autoscaling_role_arn
 
-resource "aws_route_table_association" "public_1" {
-  subnet_id      = aws_subnet.public_1.id
-  route_table_id = aws_route_table.public.id
-}
-
-resource "aws_route_table_association" "public_2" {
-  subnet_id      = aws_subnet.public_2.id
-  route_table_id = aws_route_table.public.id
+  desired_count = var.desired_count
 }
