@@ -48,7 +48,7 @@ module "ecs" {
 }
 
 module "eks" {
-  source = "./eks"
+  source = "./modules/eks"
 
   name_prefix       = var.name_prefix
   vpc_id            = module.network.vpc_id
