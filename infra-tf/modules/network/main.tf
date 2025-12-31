@@ -28,7 +28,14 @@ resource "aws_subnet" "public" {
   availability_zone       = local.azs[count.index]
   map_public_ip_on_launch = true
 
-  tags = { Name = "${var.name_prefix}-public-subnet-${count.index + 1}" }
+  tags = {
+    Name = "${var.name_prefix}-public-subnet-${count.index + 1}"
+
+    # EKS subnet discovery
+    "kubernetes.io/role/elb" = "1"
+    "kubernetes.io/cluster/helloapp-dev" = "shared"
+  }
+
 }
 
 resource "aws_route_table" "public" {
