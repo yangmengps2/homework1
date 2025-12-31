@@ -50,3 +50,7 @@ variable "enable_ecs" {
   type    = bool
   default = false
 }
+
+variable "az_count" {
+  type = number
+}

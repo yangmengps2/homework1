@@ -10,6 +10,6 @@ output "ecs_cluster_name" {
   value = try(module.ecs[0].ecs_cluster_name, null)
 }
 
-variable "az_count" {
-  type = number
+output "eks_cluster_ca" {
+  value = module.eks.cluster_ca
 }
