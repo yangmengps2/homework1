@@ -58,4 +58,9 @@ module "eks" {
 
   # 你也可以不传，用默认 helloapp-dev
   cluster_name = "helloapp-dev"
+
+  admin_principal_arns = [
+    "arn:aws:iam::939503809934:user/ian.chen",
+    "arn:aws:iam::939503809934:role/GithubActionsCICDRole"
+  ]
 }

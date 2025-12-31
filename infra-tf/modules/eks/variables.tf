@@ -19,3 +19,9 @@ variable "vpc_id" {
 variable "name_prefix" {
   type = string
 }
+
+variable "admin_principal_arns" {
+  description = "IAM principals to grant EKS cluster admin access"
+  type        = list(string)
+  default     = []
+}
