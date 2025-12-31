@@ -13,6 +13,7 @@ module "iam" {
 }
 
 module "alb" {
+  count  = var.enable_ecs ? 1 : 0
   source = "./modules/alb"
 
   name_prefix       = var.name_prefix
@@ -24,6 +25,7 @@ module "alb" {
 }
 
 module "ecs" {
+  count  = var.enable_ecs ? 1 : 0
   source = "./modules/ecs"
 
   depends_on = [module.alb]

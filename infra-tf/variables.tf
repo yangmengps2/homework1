@@ -45,3 +45,8 @@ variable "desired_count" {
   description = "ECS service desired count"
   default     = 1
 }
+
+variable "enable_ecs" {
+  type    = bool
+  default = false
+}
