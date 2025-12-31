@@ -55,3 +55,14 @@ resource "aws_route_table_association" "public" {
   subnet_id      = aws_subnet.public[count.index].id
   route_table_id = aws_route_table.public.id
 }
+
+module "eks" {
+  source = "./eks"
+
+  name_prefix       = var.name_prefix
+  vpc_id            = module.network.vpc_id
+  public_subnet_ids = module.network.public_subnet_ids
+
+  # 你也可以不传，用默认 helloapp-dev
+  cluster_name = "helloapp-dev"
+}
