@@ -1,5 +1,5 @@
 output "alb_dns_name" {
-  value = module.alb.alb_dns_name
+  value = try(module.alb[0].alb_dns_name, null)
 }
 
 output "vpc_id" {
@@ -7,5 +7,9 @@ output "vpc_id" {
 }
 
 output "ecs_cluster_name" {
-  value = module.ecs.ecs_cluster_name
+  value = try(module.ecs[0].ecs_cluster_name, null)
+}
+
+variable "az_count" {
+  type = number
 }

@@ -39,8 +39,8 @@ module "ecs" {
   container_image  = var.container_image
   container_port   = var.container_port
 
-  alb_sg_id        = module.alb.alb_sg_id
-  target_group_arn = module.alb.target_group_arn
+  alb_sg_id        = try(module.alb.alb_sg_id, null)
+  target_group_arn = try(module.alb.target_group_arn, null)
 
   ecs_execution_role_arn = module.iam.ecs_execution_role_arn
   ecs_task_role_arn      = module.iam.ecs_task_role_arn
