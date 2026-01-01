@@ -3,9 +3,8 @@ locals {
   lbc_sa_name   = "aws-load-balancer-controller"
 }
 
-# 拉官方 policy（v2.8.2 示例；以后你也可以 pin 到你想要的版本）
 data "http" "lbc_iam_policy" {
-  url = "https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.8.2/docs/install/iam_policy.json"
+  url = "https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/main/docs/install/iam_policy.json"
 }
 
 resource "aws_iam_policy" "lbc" {
