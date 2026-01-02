@@ -6,42 +6,31 @@ resource "kubernetes_manifest" "helloapp_image_updater" {
       name      = "helloapp-dev"
       namespace = "argocd"
     }
+
     spec = {
-      # 目标 ArgoCD Application
-      application = {
-        name      = "helloapp-dev"
-        namespace = "argocd"
+      # 在哪里找 Applications（通常就是 argocd）
+      namespace = "argocd"
+
+      # 全局默认设置
+      commonUpdateSettings = {
+        updateStrategy  = "latest"
+        allowTags       = "regexp:^sha-[0-9a-f]{7,40}$"
+        writeBackMethod = "git:secret:argocd/helloapp-gitops-write-creds"
+        gitBranch       = "main:dev"
+        writeBackTarget = "kustomization"
       }
 
-      # 镜像源（ECR）
-      images = [
+      # 选择要管理的 Application
+      applicationRefs = [
         {
-          name     = "helloapp"
-          image    = "939503809934.dkr.ecr.ap-southeast-2.amazonaws.com/helloapp"
-          strategy = "latest"
-          allowTags = {
-            regexp = "^sha-[0-9a-f]{7,40}$"
-          }
+          # 最简单：按名字精确匹配
+          name = "helloapp-dev"
         }
       ]
-
-      # 写回 Git（dev 分支 + secret）
-      git = {
-        branch = "main:dev"
-        writeBack = {
-          method = "secret"
-          secretRef = {
-            name      = "helloapp-gitops-write-creds"
-            namespace = "argocd"
-          }
-        }
-        # 让它更新 kustomization
-        target = "kustomization"
-      }
     }
   }
 
   depends_on = [
-    helm_release.argocd_image_updater,
+    helm_release.argocd_image_updater
   ]
 }
