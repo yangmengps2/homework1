@@ -127,7 +127,7 @@ resource "helm_release" "argocd_image_updater" {
     value = "false"
   }
   set {
-    name  = "rbac.create"
+    name  = "rbac.enabled"
     value = "false"
   }
   set {
