@@ -162,13 +162,23 @@ resource "helm_release" "argocd_image_updater" {
         scripts = {
           "ecr-login.sh" = <<-EOT
             #!/bin/sh
-            aws ecr --region "${local.ecr_region}" get-authorization-token \
-              --output text --query 'authorizationData[].authorizationToken' | base64 -d
+            set -eu
+
+            token="$(aws ecr --region "${local.ecr_region}" get-authorization-token \
+              --output text --query 'authorizationData[0].authorizationToken')"
+
+            creds="$(printf '%s' "$token" | base64 -d)"
+
+            user="$(printf '%s' "$creds" | cut -d: -f1)"
+            pass="$(printf '%s' "$creds" | cut -d: -f2-)"
+
+            printf '%s:%s' "$user" "$pass"
           EOT
         }
       }
     })
   ]
+
 
   depends_on = [
     aws_iam_role_policy_attachment.argocd_image_updater,
