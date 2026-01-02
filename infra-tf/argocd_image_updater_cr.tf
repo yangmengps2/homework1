@@ -26,7 +26,7 @@ resource "kubernetes_manifest" "helloapp_image_updater" {
           branch = "dev"
 
           # 写回目标：kustomization + 相对路径（就是你 application 的 spec.source.path）
-          writeBackTarget = "kustomization:apps/helloapp/overlays/dev"
+          writeBackTarget = "kustomization"
 
           # repository 可不填：CRD 说会从 Application.spec.source.repoURL 推断
           # repository = "https://github.com/yangmengps2/helloapp-gitops.git"
