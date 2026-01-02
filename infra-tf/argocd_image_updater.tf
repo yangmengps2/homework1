@@ -89,10 +89,18 @@ resource "kubernetes_service_account" "argocd_image_updater" {
 resource "kubernetes_cluster_role" "argocd_image_updater" {
   metadata { name = "argocd-image-updater" }
 
+  # 允许读写 ArgoCD Applications（你原来就有）
   rule {
     api_groups = ["argoproj.io"]
     resources  = ["applications"]
     verbs      = ["get", "list", "watch", "patch", "update"]
+  }
+
+  # 关键：允许读 ImageUpdater CRD（不然它启动就报 forbidden）
+  rule {
+    api_groups = ["argocd-image-updater.argoproj.io"]
+    resources  = ["imageupdaters"]
+    verbs      = ["get", "list", "watch"]
   }
 }
 
