@@ -13,9 +13,9 @@ resource "kubernetes_manifest" "helloapp_image_updater" {
 
       # 全局默认：怎么挑选新版本
       commonUpdateSettings = {
-        updateStrategy = "latest"
+        updateStrategy = "newest-build"
         # 这里是“regex pattern”，不要写 allow-tags 的 regexp: 前缀，直接 regex 更稳
-        allowTags      = "^sha-[0-9a-f]{7,40}$"
+        allowTags      = "regexp:^sha-[0-9a-f]{7,40}$"
       }
 
       # 全局默认：怎么写回 Git（你要 PR flow，所以写 dev 分支）
