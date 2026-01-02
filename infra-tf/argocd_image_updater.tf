@@ -127,6 +127,10 @@ resource "helm_release" "argocd_image_updater" {
     value = "false"
   }
   set {
+    name  = "rbac.create"
+    value = "false"
+  }
+  set {
     name  = "serviceAccount.name"
     value = kubernetes_service_account.argocd_image_updater.metadata[0].name
   }
