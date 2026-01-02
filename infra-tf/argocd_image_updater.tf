@@ -122,6 +122,38 @@ resource "kubernetes_cluster_role_binding" "argocd_image_updater" {
   }
 }
 
+resource "kubernetes_role" "argocd_image_updater_secret_read" {
+  metadata {
+    name      = "argocd-image-updater-secret-read"
+    namespace = "argocd"
+  }
+
+  rule {
+    api_groups = [""]
+    resources  = ["secrets"]
+    verbs      = ["get"]
+  }
+}
+
+resource "kubernetes_role_binding" "argocd_image_updater_secret_read" {
+  metadata {
+    name      = "argocd-image-updater-secret-read"
+    namespace = "argocd"
+  }
+
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "Role"
+    name      = kubernetes_role.argocd_image_updater_secret_read.metadata[0].name
+  }
+
+  subject {
+    kind      = "ServiceAccount"
+    name      = local.image_updater_sa_name   # 你的 SA 名
+    namespace = "argocd"
+  }
+}
+
 ########################################
 # Helm install: argocd-image-updater
 ########################################
