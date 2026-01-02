@@ -164,6 +164,11 @@ resource "helm_release" "argocd_image_updater" {
             #!/bin/sh
             set -eu
 
+            # 关键：避免 aws cli 往 /app/.aws 写（rootfs 只读）
+            export HOME=/tmp
+            export AWS_CONFIG_FILE=/tmp/aws-config
+            export AWS_SHARED_CREDENTIALS_FILE=/tmp/aws-credentials
+
             token="$(aws ecr --region "${local.ecr_region}" get-authorization-token \
               --output text --query 'authorizationData[0].authorizationToken')"
 
