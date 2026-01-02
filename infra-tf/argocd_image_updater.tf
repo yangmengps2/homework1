@@ -21,11 +21,13 @@ resource "aws_iam_policy" "argocd_image_updater_ecr" {
         Effect = "Allow"
         Action = [
           "ecr:GetAuthorizationToken",
+          "ecr:DescribeRepositories",
+          "ecr:ListImages",
+          "ecr:DescribeImages",
           "ecr:BatchGetImage",
           "ecr:BatchCheckLayerAvailability",
-          "ecr:DescribeImages",
-          "ecr:DescribeRepositories",
-          "ecr:ListImages"
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:GetRepositoryPolicy"
         ]
         Resource = "*"
       }
