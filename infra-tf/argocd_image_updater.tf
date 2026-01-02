@@ -100,7 +100,7 @@ resource "kubernetes_cluster_role" "argocd_image_updater" {
   rule {
     api_groups = ["argocd-image-updater.argoproj.io"]
     resources  = ["imageupdaters"]
-    verbs      = ["get", "list", "watch"]
+    verbs      = ["get", "list", "watch", "patch", "update"]
   }
 }
 
