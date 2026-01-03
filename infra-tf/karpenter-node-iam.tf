@@ -6,7 +6,7 @@
 # - Create an Instance Profile for Karpenter to reference
 
 resource "aws_iam_role" "karpenter_node" {
-  name = "${var.cluster_name}-karpenter-node-role"
+  name = "${module.eks.cluster_name}-karpenter-node-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -49,11 +49,11 @@ resource "aws_iam_role_policy_attachment" "karpenter_node_ssm" {
 
 # --- Instance Profile for EC2 instances ---
 resource "aws_iam_instance_profile" "karpenter_node" {
-  name = "${var.cluster_name}-karpenter-node-instance-profile"
+  name = "${module.eks.cluster_name}-karpenter-node-instance-profile"
   role = aws_iam_role.karpenter_node.name
 
   tags = {
-    Name = "${var.cluster_name}-karpenter-node-instance-profile"
+    Name = "${module.eks.cluster_name}-karpenter-node-instance-profile"
   }
 }
 
