@@ -20,7 +20,7 @@ resource "aws_iam_role" "karpenter_node" {
   })
 
   tags = {
-    Name = "${var.cluster_name}-karpenter-node-role"
+    Name = "${module.eks.cluster_name}-karpenter-node-role"
   }
 }
 
