@@ -9,15 +9,12 @@ on:
         default: 'NO'
 
 permissions:
-  id-token: write   # required for OIDC
+  id-token: write
   contents: read
 
 jobs:
   destroy:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: infra-tf
 
     steps:
       - name: Guard - require confirmation
@@ -42,7 +39,9 @@ jobs:
           terraform_version: 1.7.5
 
       - name: Terraform Init
+        working-directory: infra-tf
         run: terraform init
 
       - name: Terraform Destroy
+        working-directory: infra-tf
         run: terraform destroy -auto-approve
