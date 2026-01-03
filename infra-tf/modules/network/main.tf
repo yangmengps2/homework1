@@ -34,6 +34,7 @@ resource "aws_subnet" "public" {
     # EKS subnet discovery
     "kubernetes.io/role/elb" = "1"
     "kubernetes.io/cluster/helloapp-dev" = "shared"
+    "karpenter.sh/discovery" = "helloapp-dev"
   }
 
 }
