@@ -106,9 +106,7 @@ resource "aws_iam_role_policy" "karpenter_controller" {
           "ssm:GetParameter",
           "ssm:GetParameters"
         ]
-        Resource = [
-          "arn:aws:ssm:ap-southeast-2::parameter/aws/service/eks/optimized-ami/*"
-        ]
+        Resource = ["*"]
       },
 
       # ✅ 有些版本在解析 AMI 时也需要 DescribeImages
