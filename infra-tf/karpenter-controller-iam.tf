@@ -97,6 +97,27 @@ resource "aws_iam_role_policy" "karpenter_controller" {
           "sqs:ChangeMessageVisibility"
         ]
         Resource = [local.karpenter_interruption_queue_arn]
+      },
+
+      # ✅ 让 Karpenter 能从 SSM Parameter Store 取 EKS Optimized AMI 的 image_id
+      {
+        Effect = "Allow"
+        Action = [
+          "ssm:GetParameter",
+          "ssm:GetParameters"
+        ]
+        Resource = [
+          "arn:aws:ssm:ap-southeast-2:939503809934:parameter/aws/service/eks/optimized-ami/*"
+        ]
+      },
+
+      # ✅ 有些版本在解析 AMI 时也需要 DescribeImages
+      {
+        Effect = "Allow"
+        Action = [
+          "ec2:DescribeImages"
+        ]
+        Resource = ["*"]
       }
     ]
   })
