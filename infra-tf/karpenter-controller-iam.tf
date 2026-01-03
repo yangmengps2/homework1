@@ -107,7 +107,7 @@ resource "aws_iam_role_policy" "karpenter_controller" {
           "ssm:GetParameters"
         ]
         Resource = [
-          "arn:aws:ssm:ap-southeast-2:939503809934:parameter/aws/service/eks/optimized-ami/*"
+          "arn:aws:ssm:ap-southeast-2::parameter/aws/service/eks/optimized-ami/*"
         ]
       },
 
